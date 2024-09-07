@@ -1,27 +1,30 @@
-#include <NvInfer.h>
-#include <cuda_runtime_api.h>
 #include <iostream>
 #include <sstream>
-#include "utils/nv_utils.h"
-#include "tensorrt/trt_context.h"
+#include <memory>
+#include "engine/trt_engine.h"
 
 using namespace trt_sample;
 
-int main() {
-    ContextInitOptions options;
-    options.trt_file = "/data/workspace/CODE/TensorRT_inference/models/resnet50.engine";
+int main(int argc, char *argv[]) {
 
-    std::unique_ptr<TrtContext> context_ptr(new TrtContext());
-
-    if (!context_ptr->init(options)) {
-    	std::cerr<<"Failed to create TrtContext object"<<std::endl;
-	return -1;
+    if (argc <= 1) {
+        std::cout<<"input model config file path" << std::endl;
+        return -1;
     }
 
-    std::cout<<std::endl;
-    context_ptr->info();
+    const std::string config_file(argv[1]);
 
-    std::cout<< "----Done----"<<std::endl;
+    // 1. create engine
+    std::unique_ptr<TrtEngine> engine_ptr(new TrtEngine());
+
+    if (!engine_ptr->init(config_file)) {
+        std::cerr << "Failed to create TrtEngine object" << std::endl;
+        return -1;
+    }
+
+    // 2. run engine
+    engine_ptr->run();
 
     return 0;
 }
+

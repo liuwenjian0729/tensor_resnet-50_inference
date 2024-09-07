@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package trt_sample.common;
+
+message BackendParam {
+    string onnx_file = 1;
+    string engine_file = 2; 
+};
+
+

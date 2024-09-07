@@ -4,10 +4,10 @@
 
 namespace trt_sample {
 
-bool TrtContext::init(const ContextInitOptions& options) {
+bool TrtContext::init(const ContextInitParams& params) {
     runtime_.reset(nvinfer1::createInferRuntime(gLogger));
     
-    engine_.reset(loadEngine(options.trt_file, runtime_.get()));
+    engine_.reset(loadEngine(params.trt_file, runtime_.get()));
     if (engine_.get() == nullptr) {
         std::cerr << "Failed to load engine" << std::endl;
         return false;
@@ -56,3 +56,4 @@ void TrtContext::info() {
 }
 
 }   // namespace trt_sample
+

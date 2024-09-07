@@ -1,0 +1,2 @@
+onnx_file: "/data/workspace/CODE/TensorRT_inference/models/resnet50.onnx"
+engine_file: "/data/workspace/CODE/TensorRT_inference/models/resnet50.engine"

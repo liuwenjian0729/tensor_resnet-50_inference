@@ -3,19 +3,16 @@
 
 #include <memory>
 #include <NvInfer.h>
+#include "base/base_context.h"
 
 namespace trt_sample {
 
-struct ContextInitOptions {
-        std::string trt_file;
-};
-
-class TrtContext {
+class TrtContext:public BaseContext {
         public:
             TrtContext() = default;
             ~TrtContext() = default;
 
-            bool init(const ContextInitOptions& options);
+            bool init(const ContextInitParams& params) override;
 
             nvinfer1::IExecutionContext* get_context() { return context_.get(); }
 
@@ -29,3 +26,4 @@ class TrtContext {
 }   // namespace trt_sample
 
 #endif  // _TRT_CONTEXT_H
+
