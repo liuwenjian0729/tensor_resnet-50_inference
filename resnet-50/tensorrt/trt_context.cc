@@ -18,7 +18,7 @@ bool TrtContext::init(const ContextInitParams& params) {
         std::cerr << "Failed to create context" << std::endl;
         return false;
     }
-
+	
     return true;
 }
 

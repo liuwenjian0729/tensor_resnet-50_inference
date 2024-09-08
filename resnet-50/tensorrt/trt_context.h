@@ -17,10 +17,6 @@ class TrtContext:public BaseContext {
             nvinfer1::IExecutionContext* get_context() { return context_.get(); }
 
 	    void info();
-        private:
-            std::unique_ptr<nvinfer1::IRuntime> runtime_;
-            std::unique_ptr<nvinfer1::ICudaEngine> engine_;
-            std::unique_ptr<nvinfer1::IExecutionContext> context_;
 };
 
 }   // namespace trt_sample

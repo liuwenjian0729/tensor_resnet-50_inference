@@ -1,12 +1,19 @@
 cmake_minimum_required(VERSION 3.13)
 project(resnet-50-demo)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 # CUDA & TensorRT
 find_package(CUDA REQUIRED)
 include_directories(${CUDA_INCLUDE_DIRS})
 link_directories(${CUDA_LIBRARY_DIRS})
 include_directories(/data/sft/TensorRT-8.6.1.6/include)
 link_directories(/data/sft/TensorRT-8.6.1.6/lib)
+
+# Opencv
+find_package(OpenCV REQUIRED)
+message(STATUS "Found OpenCV version: ${OpenCV_VERSION}")
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 # proto
 find_package(Protobuf REQUIRED)
@@ -33,6 +40,7 @@ add_executable(${PROJECT_NAME} main.cc ${SRC_FILES} ${PROTO_SRCS})
 target_link_libraries(${PROJECT_NAME} 
     ${CUDA_LIBRARIES}
     ${PROTOBUF_LIBRARIES}
+    ${OpenCV_LIBS}
     nvinfer
     nvparsers
     nvonnxparser
