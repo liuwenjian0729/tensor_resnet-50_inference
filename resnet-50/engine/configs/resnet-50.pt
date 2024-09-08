@@ -1,5 +1,5 @@
 onnx_file: "/data/workspace/CODE/TensorRT_inference/models/resnet50.onnx"
 engine_file: "/data/workspace/CODE/TensorRT_inference/models/resnet50.engine"
-input_names: "input.1"
-output_names: "495"
+input_names: "data"
+output_names: "resnetv17_dense0_fwd"
 max_batch_size: 1

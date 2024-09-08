@@ -9,6 +9,7 @@ namespace trt_sample {
 
 struct ContextInitParams {
     std::string trt_file;
+    std::string onnx_file;
 };
 
 class BaseContext {

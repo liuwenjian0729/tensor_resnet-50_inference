@@ -6,7 +6,12 @@ namespace trt_sample {
 
 bool TrtContext::init(const ContextInitParams& params) {
     runtime_.reset(nvinfer1::createInferRuntime(gLogger));
-    
+   
+    // if (!onnx2trtEngine(params.trt_file, params.onnx_file)) {
+    //    std::cerr << "Failed to convert onnx" << std::endl;
+    //	return false;
+    // }
+
     engine_.reset(loadEngine(params.trt_file, runtime_.get()));
     if (engine_.get() == nullptr) {
         std::cerr << "Failed to load engine" << std::endl;

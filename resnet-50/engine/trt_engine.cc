@@ -57,6 +57,15 @@ void TrtEngine::run() {
 
     // 4. post process
     std::cout<<"size of prob: "<<output.size()<<std::endl;
+    float maxp =  INT_MIN;
+    int index = 0;
+    for (int i=0; i< output.size(); ++i) {
+	if(output[i]>maxp) {
+	    maxp = output[i];
+	    index = i;
+	}
+    }
+    std::cout<<"maxp: "<<maxp<<" index: "<<index<<std::endl;
 }
 
 std::vector<float> TrtEngine::mat2vector(const cv::Mat& img, bool need_rgb_swap) {
@@ -68,19 +77,25 @@ std::vector<float> TrtEngine::mat2vector(const cv::Mat& img, bool need_rgb_swap)
     }
 
     // normalize
-    img_float /= 255.0f;
+    std::vector<float> mean_vec = {0.485, 0.456, 0.406};
+    std::vector<float> std_vec = {0.229, 0.224, 0.225};
 
-    // read to vector
-    int rows = img_float.rows, cols = img_float.cols, channels = img_float.channels();
-    std::vector<float> img_vec(rows * cols * channels);
-   for (int y = 0; y < rows; y++) {
-       for (int x = 0; x < cols; x++) {
-           for (int c = 0; c < channels; c++) {
-               img_vec[(y * cols + x) * channels + c] = img_float.at<float>(y, x * channels + c);
-           }
-       }
-   }
-    return img_vec;
+    std::vector<float> norm_image;
+    norm_image.resize(img_float.rows * img_float.cols * 3);
+
+    int count = 0;
+    for(int i = 0; i<img_float.rows; i++){
+        uchar* uc_pixel = img_float.data + i * img_float.step;
+        for(int j = 0; j<img_float.cols; j++) {
+            norm_image[count] = (uc_pixel[0] / 255. - mean_vec[0]) / std_vec[0];
+            norm_image[count + img_float.rows * img_float.cols] = (uc_pixel[1] / 255. - mean_vec[1]) / std_vec[1];
+            norm_image[count + 2 * img_float.rows * img_float.cols] = (uc_pixel[2] / 255. - mean_vec[2]) / std_vec[2];
+            uc_pixel += 3;
+            count++;
+        }
+    } 
+
+    return norm_image;
 }
 
 void TrtEngine::destroy() {
@@ -89,4 +104,5 @@ void TrtEngine::destroy() {
 }
 
 } // namespace name
+
 

@@ -51,9 +51,14 @@ bool TrtBackend::Inference(const std::vector<float>& input, std::vector<float>* 
         int index = iter.first;
         auto param = iter.second;
         if(engine.bindingIsInput(index)) {
+            std::cout<<"input name:"<<param.first<<" input size:"<<param.second<<std::endl;
             cudaMemcpyAsync(buffers_[index], input.data(), param.second, cudaMemcpyHostToDevice, stream);
             break;
         }
+    }
+
+    for (auto it: input) {
+        //std::cout<<it<<" ";
     }
 
     // inference
@@ -69,7 +74,8 @@ bool TrtBackend::Inference(const std::vector<float>& input, std::vector<float>* 
         int index = iter.first;
         auto param = iter.second;
         if(!engine.bindingIsInput(index)) {
-	    output->resize(param.second);
+            std::cout<<"output name:"<<param.first<<" output size:"<<param.second<<std::endl;
+	    output->resize(1000);
             cudaMemcpyAsync(output->data(), buffers_[index], param.second, cudaMemcpyDeviceToHost, stream);
             break;
         }
@@ -89,3 +95,4 @@ IOShapeMap& TrtBackend::GetBackendIOShapes() {
 }
 
 }   // namespace trt_sample
+
