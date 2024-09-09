@@ -10,6 +10,9 @@ namespace trt_sample {
 
 Logger gLogger;
 
+///////////////////////////////////////////////////////////////////
+// dims2str()
+///////////////////////////////////////////////////////////////////
 std::string dims2str(const nvinfer1::Dims &dims) {
     std::stringstream ss;
     ss << "[";
@@ -23,6 +26,9 @@ std::string dims2str(const nvinfer1::Dims &dims) {
     return ss.str();
 }
 
+///////////////////////////////////////////////////////////////////
+// volume()
+///////////////////////////////////////////////////////////////////
 int volume(const nvinfer1::Dims& dims) {
     int size = 1;
     for (int i = 0; i < dims.nbDims; i++) {
@@ -31,6 +37,9 @@ int volume(const nvinfer1::Dims& dims) {
     return size;
 }
 
+///////////////////////////////////////////////////////////////////
+// data_type_size()
+///////////////////////////////////////////////////////////////////
 int data_type_size(nvinfer1::DataType type) {
     switch (type) {
         case nvinfer1::DataType::kINT32:
@@ -46,6 +55,9 @@ int data_type_size(nvinfer1::DataType type) {
     }
 }
 
+///////////////////////////////////////////////////////////////////
+// onnx2trtEngine()
+///////////////////////////////////////////////////////////////////
 bool onnx2trtEngine(const std::string& trt_file, const std::string& onnx_file) {
     // 1. create builder
     std::unique_ptr<nvinfer1::IBuilder> builder_ptr(nvinfer1::createInferBuilder(gLogger));
@@ -94,6 +106,9 @@ bool onnx2trtEngine(const std::string& trt_file, const std::string& onnx_file) {
     return true;
 }
 
+///////////////////////////////////////////////////////////////////
+// loadEngine()
+///////////////////////////////////////////////////////////////////
 nvinfer1::ICudaEngine* loadEngine(const std::string& trt_file, nvinfer1::IRuntime* runtime) {
     std::ifstream ifs(trt_file, std::ios::binary);
     if (!ifs.good()) {

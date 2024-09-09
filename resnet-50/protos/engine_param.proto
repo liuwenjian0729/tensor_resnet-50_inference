@@ -8,7 +8,9 @@ message BackendParam {
     repeated string input_names = 3;
     repeated string output_names = 4;
     int32 max_batch_size = 5;
+    int32 width = 6;
+    int32 height = 7;
+    string format = 8;
+    repeated float mean = 9;
+    repeated float scale = 10;
 };
-
-
-

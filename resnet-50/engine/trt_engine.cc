@@ -1,49 +1,22 @@
-#include <cmath>
-#include <math.h>
 #include "tensorrt/trt_backend.h"
 #include "engine/trt_engine.h"
 #include "utils/proto_utils.h"
-#include "backend_param.pb.h"
+#include "utils/img_utils.h"
+#include "utils/net_utils.h"
+#include "engine_param.pb.h"
 
 namespace trt_sample {
 
-std::vector<float> softmax(const std::vector<float>& input) {
-    std::vector<float> probs;
-
-    // max val
-    auto get_max = [](const std::vector<float>& vec) -> float {
-        float max = std::numeric_limits<float>::lowest();
-        for (float val : vec) {
-            if (val > max) {
-                max = val;
-            }
-        }
-        return max;
-    };
-
-    // cal max value
-    float max_val = get_max(input);
-    // float max_val = 0;
-    float sum = 0.0f;
-
-    for (auto val: input) {
-        float exp_val = std::exp(val - max_val);
-        sum += exp_val;
-        probs.emplace_back(exp_val);
-    }
-
-    // nomalize
-    for (size_t i = 0; i < probs.size(); ++i) {
-        probs[i] /= sum;
-    }
-
-    return probs;
-}
-
+///////////////////////////////////////////////////////////////////
+// TrtEngine::~TrtEngine()
+///////////////////////////////////////////////////////////////////
 TrtEngine::~TrtEngine() {
     this->destroy();
 }
 
+///////////////////////////////////////////////////////////////////
+// TrtEngine::init()
+///////////////////////////////////////////////////////////////////
 bool TrtEngine::init(const std::string& config_file){
     // 1. load config
     trt_sample::common::BackendParam configs;
@@ -51,8 +24,16 @@ bool TrtEngine::init(const std::string& config_file){
         std::cerr << "Failed to load backend param from text file: " << config_file << std::endl;
         return false;
     }
-    // debug
-    std::cout << "engine_file: " << configs.engine_file() <<"max batch size: "<<configs.max_batch_size()<< std::endl;
+
+    params_.format = configs.format();
+    params_.width = configs.width();
+    params_.height = configs.height();
+    for (auto& val : configs.mean()) {
+        params_.mean_vec.emplace_back(val);
+    }
+    for (auto& val : configs.scale()) {
+        params_.scale_vec.emplace_back(val);
+    }
 
     // 2. create backend
     backend_.reset(new TrtBackend());
@@ -76,6 +57,9 @@ bool TrtEngine::init(const std::string& config_file){
     return true;
 }
 
+///////////////////////////////////////////////////////////////////
+// TrtEngine::run()
+///////////////////////////////////////////////////////////////////
 void TrtEngine::run() {
     // 1. read image
     cv::Mat image = cv::imread("../scripts/kitten.jpg");
@@ -84,14 +68,14 @@ void TrtEngine::run() {
     cv::resize(image, image, cv::Size(224, 224), 0, 0, cv::INTER_LINEAR);
     std::vector<float> input;
     std::vector<float> output;
-    input = mat2vector(image);
-    std::cout<<"rows: "<<image.rows<<" cols: "<<image.cols<<" channels: "<<image.channels()<<" size: "<<input.size()<<std::endl;
+
+    input = ImageUtils::mat2vector(image, params_.mean_vec, params_.scale_vec);
 
     // 3. inference
     backend_->Inference(input, &output, stream_);
 
     // 4. post process
-    std::vector<float> probs = softmax(output);
+    std::vector<float> probs = NetworkUtils::Softmax(output);
     float prob = std::numeric_limits<float>::lowest();
     int index = 0;
     for (int i=0; i< probs.size(); ++i) {
@@ -103,39 +87,9 @@ void TrtEngine::run() {
     std::cout<<"prob: "<<prob<<" index: "<<index<<std::endl;
 }
 
-std::vector<float> TrtEngine::mat2vector(const cv::Mat& img, bool need_rgb_swap) {
-    cv::Mat img_float;
-    if (need_rgb_swap) {
-        cv::cvtColor(img, img_float, cv::COLOR_BGR2RGB);
-    } else {
-        img.convertTo(img_float, CV_32F);
-    }
-
-    int height = img_float.rows;
-    int width = img_float.cols;
-    int channels = img_float.channels();
-
-    std::vector<float> mean_vec = {0.485, 0.456, 0.406};
-    std::vector<float> std_vec = {0.229, 0.224, 0.225};
-
-    // convert HWC to CHW
-    std::vector<float> chw_data(channels * height * width);
-    int chw_index = 0;
-
-    int index = 0;
-    for (int c = 0; c < channels; ++c) {
-        for (int i = 0; i < height; ++i) {
-            for (int j = 0; j < width; ++j) {
-                auto pixel = img.ptr<cv::Vec3b>(i);
-                float value = pixel[j][c];
-                chw_data[chw_index++] = ((value / 255) - mean_vec[c]) / std_vec[c];
-            }
-        }
-    }
-
-    return chw_data;
-}
-
+///////////////////////////////////////////////////////////////////
+// TrtEngine::destroy()
+///////////////////////////////////////////////////////////////////
 void TrtEngine::destroy() {
     cudaStreamDestroy(stream_);
     backend_.reset();

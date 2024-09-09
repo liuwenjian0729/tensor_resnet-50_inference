@@ -1,11 +1,5 @@
-/*
- * @Author: liuwenjian1523@163.com
- * @Date: 2024-09-06 15:29:49
- * @LastEditors: liuwenjian1523@163.com
- * @LastEditTime: 2024-09-09 15:18:18
- * @Description: 请填写简介
- */
-#pragma once
+#ifndef _NV_LOGGER_H
+#define _NV_LOGGER_H
 
 #include <iostream>
 #include <NvInfer.h>
@@ -37,3 +31,5 @@ public:
 extern Logger gLogger;
 
 }   // namespace trt_sample
+
+#endif  // _NV_LOGGER_H

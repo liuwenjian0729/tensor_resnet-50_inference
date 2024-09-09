@@ -17,7 +17,24 @@ public:
     BaseContext() = default;
     virtual ~BaseContext() = default;
 
+    /*****************************************************************************
+     * 
+     * @brief init tensotrrt context
+     * 
+     * @param [in] init_params params for init context
+     * 
+     * @return true init success
+     * 
+     *****************************************************************************/
     virtual bool init(const ContextInitParams &init_params) = 0;
+
+    /*****************************************************************************
+     * 
+     * @brief get IExecutionContext pointer object
+     * 
+     * @return pointer of IExecutionContext
+     * 
+     *****************************************************************************/
     nvinfer1::IExecutionContext* get_context() { return context_.get(); }
 
 protected:

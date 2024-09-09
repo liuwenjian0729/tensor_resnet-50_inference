@@ -8,6 +8,16 @@
 
 namespace trt_sample {
 
+/*****************************************************************************
+ * 
+ * @brief load config from text file
+ * 
+ * @param [in] path config file path
+ * @param [out] msg config message by protobuf object
+ * 
+ * @return true load success
+ * 
+ *****************************************************************************/
 bool LoadProtoFromTextFile(const std::string &path, google::protobuf::Message *msg);
 
 }   // namespace trt_sample

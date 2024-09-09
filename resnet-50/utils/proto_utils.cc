@@ -2,6 +2,9 @@
 
 namespace trt_sample {
 
+///////////////////////////////////////////////////////////////////
+// LoadProtoFromTextFile()
+///////////////////////////////////////////////////////////////////
 bool LoadProtoFromTextFile(const std::string &path, google::protobuf::Message *msg) {
     int fd = open(path.c_str(), O_RDONLY);
     google::protobuf::io::FileInputStream file_in(fd);

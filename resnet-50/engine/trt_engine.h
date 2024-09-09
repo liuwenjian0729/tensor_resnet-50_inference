@@ -1,10 +1,3 @@
-/*
- * @Author: liuwenjian1523@163.com
- * @Date: 2024-09-07 23:12:45
- * @LastEditors: liuwenjian1523@163.com
- * @LastEditTime: 2024-09-09 15:23:32
- * @Description: 请填写简介
- */
 #ifndef _TRT_ENGINE_H
 #define _TRT_ENGINE_H
 
@@ -14,6 +7,14 @@
 #include "base/base_backend.h"
 
 namespace trt_sample {
+
+struct EngineParams {
+    std::string format;             // image format RBG or BGR
+    int32_t width;                  // input image width
+    int32_t height;                 // input image height
+    std::vector<float> mean_vec;    // mean value for normalization
+    std::vector<float> scale_vec;     // std value for normalization
+};
 
 class TrtEngine {
 public:
@@ -53,10 +54,9 @@ public:
     void destroy();
 
 private:
-    std::vector<float> mat2vector(const cv::Mat& img, bool need_rgb_swap = true);
-
     std::unique_ptr<BaseBackend> backend_;
     cudaStream_t stream_;
+    EngineParams params_;
 };
 
 }   //  namespace trt_sample
