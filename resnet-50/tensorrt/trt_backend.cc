@@ -74,8 +74,7 @@ bool TrtBackend::Inference(const std::vector<float>& input, std::vector<float>* 
         int index = iter.first;
         auto param = iter.second;
         if(!engine.bindingIsInput(index)) {
-            std::cout<<"output name:"<<param.first<<" output size:"<<param.second<<std::endl;
-	    output->resize(1000);
+	        output->resize(1000);
             cudaMemcpyAsync(output->data(), buffers_[index], param.second, cudaMemcpyDeviceToHost, stream);
             break;
         }

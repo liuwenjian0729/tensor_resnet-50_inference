@@ -1,9 +1,44 @@
+#include <cmath>
+#include <math.h>
 #include "tensorrt/trt_backend.h"
 #include "engine/trt_engine.h"
 #include "utils/proto_utils.h"
 #include "backend_param.pb.h"
 
 namespace trt_sample {
+
+std::vector<float> softmax(const std::vector<float>& input) {
+    std::vector<float> probs;
+
+    // max val
+    auto get_max = [](const std::vector<float>& vec) -> float {
+        float max = std::numeric_limits<float>::lowest();
+        for (float val : vec) {
+            if (val > max) {
+                max = val;
+            }
+        }
+        return max;
+    };
+
+    // cal max value
+    float max_val = get_max(input);
+    // float max_val = 0;
+    float sum = 0.0f;
+
+    for (auto val: input) {
+        float exp_val = std::exp(val - max_val);
+        sum += exp_val;
+        probs.emplace_back(exp_val);
+    }
+
+    // nomalize
+    for (size_t i = 0; i < probs.size(); ++i) {
+        probs[i] /= sum;
+    }
+
+    return probs;
+}
 
 TrtEngine::~TrtEngine() {
     this->destroy();
@@ -43,7 +78,7 @@ bool TrtEngine::init(const std::string& config_file){
 
 void TrtEngine::run() {
     // 1. read image
-    cv::Mat image = cv::imread("/data/workspace/CODE/test/cifar-10/cat.jpeg");
+    cv::Mat image = cv::imread("../scripts/kitten.jpg");
 
     // 2. preprocess
     cv::resize(image, image, cv::Size(224, 224), 0, 0, cv::INTER_LINEAR);
@@ -56,16 +91,16 @@ void TrtEngine::run() {
     backend_->Inference(input, &output, stream_);
 
     // 4. post process
-    std::cout<<"size of prob: "<<output.size()<<std::endl;
-    float maxp =  INT_MIN;
+    std::vector<float> probs = softmax(output);
+    float prob = std::numeric_limits<float>::lowest();
     int index = 0;
-    for (int i=0; i< output.size(); ++i) {
-	if(output[i]>maxp) {
-	    maxp = output[i];
-	    index = i;
-	}
+    for (int i=0; i< probs.size(); ++i) {
+        if(probs[i] > prob) {
+            prob = probs[i];
+            index = i;
+        }
     }
-    std::cout<<"maxp: "<<maxp<<" index: "<<index<<std::endl;
+    std::cout<<"prob: "<<prob<<" index: "<<index<<std::endl;
 }
 
 std::vector<float> TrtEngine::mat2vector(const cv::Mat& img, bool need_rgb_swap) {
