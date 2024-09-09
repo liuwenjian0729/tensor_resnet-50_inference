@@ -20,7 +20,7 @@ find_package(Protobuf REQUIRED)
 message(STATUS "Found Protobuf: ${PROTOBUF_VERSION}")
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 
-set(PROTO_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/protos/backend_param.proto")
+set(PROTO_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/protos/engine_param.proto")
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILE_PATH})
 
 # Local head & source files

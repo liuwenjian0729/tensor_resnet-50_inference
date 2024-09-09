@@ -1,5 +1,6 @@
 #include <cmath>
 #include <math.h>
+#include <limits>
 #include "utils/net_utils.h"
 
 namespace NetworkUtils {

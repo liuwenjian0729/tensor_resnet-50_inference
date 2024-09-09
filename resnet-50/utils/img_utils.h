@@ -21,8 +21,8 @@ typedef enum {
  * @return Vector of image pixels
  * 
  *******************************************************************************/
-std::vector<float> mat2vector(const cv::Mat& img, std::vector<float> mean_vec,
-    std::vector<float> std_vec, bool need_rgb_swap);
+std::vector<float> mat2vector(const cv::Mat& img, const std::vector<float>& mean_vec,
+    const std::vector<float>& std_vec, bool need_rgb_swap=true);
 
 }   // namespace ImageUtils
 

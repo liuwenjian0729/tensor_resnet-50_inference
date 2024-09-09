@@ -3,6 +3,6 @@ engine_file: "/data/workspace/CODE/TensorRT_inference/models/resnet50.engine"
 input_names: "data"
 output_names: "resnetv17_dense0_fwd"
 max_batch_size: 1
-format: RBG
+format: "RBG"
 mean: [0.485, 0.456, 0.406]
 scale: [0.229, 0.224, 0.225]
