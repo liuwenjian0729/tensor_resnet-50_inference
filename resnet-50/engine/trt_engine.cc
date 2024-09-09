@@ -76,26 +76,29 @@ std::vector<float> TrtEngine::mat2vector(const cv::Mat& img, bool need_rgb_swap)
         img.convertTo(img_float, CV_32F);
     }
 
-    // normalize
+    int height = img_float.rows;
+    int width = img_float.cols;
+    int channels = img_float.channels();
+
     std::vector<float> mean_vec = {0.485, 0.456, 0.406};
     std::vector<float> std_vec = {0.229, 0.224, 0.225};
 
-    std::vector<float> norm_image;
-    norm_image.resize(img_float.rows * img_float.cols * 3);
+    // convert HWC to CHW
+    std::vector<float> chw_data(channels * height * width);
+    int chw_index = 0;
 
-    int count = 0;
-    for(int i = 0; i<img_float.rows; i++){
-        uchar* uc_pixel = img_float.data + i * img_float.step;
-        for(int j = 0; j<img_float.cols; j++) {
-            norm_image[count] = (uc_pixel[0] / 255. - mean_vec[0]) / std_vec[0];
-            norm_image[count + img_float.rows * img_float.cols] = (uc_pixel[1] / 255. - mean_vec[1]) / std_vec[1];
-            norm_image[count + 2 * img_float.rows * img_float.cols] = (uc_pixel[2] / 255. - mean_vec[2]) / std_vec[2];
-            uc_pixel += 3;
-            count++;
+    int index = 0;
+    for (int c = 0; c < channels; ++c) {
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+                auto pixel = img.ptr<cv::Vec3b>(i);
+                float value = pixel[j][c];
+                chw_data[chw_index++] = ((value / 255) - mean_vec[c]) / std_vec[c];
+            }
         }
-    } 
+    }
 
-    return norm_image;
+    return chw_data;
 }
 
 void TrtEngine::destroy() {

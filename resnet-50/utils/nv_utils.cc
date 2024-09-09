@@ -11,16 +11,39 @@ namespace trt_sample {
 Logger gLogger;
 
 std::string dims2str(const nvinfer1::Dims &dims) {
-  std::stringstream ss;
-  ss << "[";
-  for (int i = 0; i < dims.nbDims; ++i) {
-    if (i > 0) {
-      ss << ", ";
+    std::stringstream ss;
+    ss << "[";
+    for (int i = 0; i < dims.nbDims; ++i) {
+        if (i > 0) {
+            ss << ", ";
+        }
+        ss << dims.d[i];
     }
-    ss << dims.d[i];
-  }
-  ss << "]";
-  return ss.str();
+    ss << "]";
+    return ss.str();
+}
+
+int volume(const nvinfer1::Dims& dims) {
+    int size = 1;
+    for (int i = 0; i < dims.nbDims; i++) {
+        size *= dims.d[i];
+    }
+    return size;
+}
+
+int data_type_size(nvinfer1::DataType type) {
+    switch (type) {
+        case nvinfer1::DataType::kINT32:
+            return sizeof(int32_t);
+        case nvinfer1::DataType::kFLOAT:
+            return sizeof(float);
+        case nvinfer1::DataType::kHALF:
+            return sizeof(short);
+        case nvinfer1::DataType::kINT8:
+            return sizeof(int8_t);
+        default:
+            return 0;
+    }
 }
 
 bool onnx2trtEngine(const std::string& trt_file, const std::string& onnx_file) {
@@ -90,29 +113,6 @@ nvinfer1::ICudaEngine* loadEngine(const std::string& trt_file, nvinfer1::IRuntim
 
     // create runtime
     return runtime->deserializeCudaEngine(buffer.data(), size, nullptr);
-}
-
-int volume(const nvinfer1::Dims& dims) {
-    int size = 1;
-    for (int i = 0; i < dims.nbDims; i++) {
-        size *= dims.d[i];
-    }
-    return size;
-}
-
-int data_type_size(nvinfer1::DataType type) {
-    switch (type) {
-        case nvinfer1::DataType::kINT32:
-            return sizeof(int32_t);
-        case nvinfer1::DataType::kFLOAT:
-            return sizeof(float);
-        case nvinfer1::DataType::kHALF:
-            return sizeof(short);
-        case nvinfer1::DataType::kINT8:
-            return sizeof(int8_t);
-        default:
-            return 0;
-    }
 }
 
 } // namespace name

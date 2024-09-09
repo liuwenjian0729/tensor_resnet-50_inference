@@ -1,3 +1,10 @@
+/*
+ * @Author: liuwenjian1523@163.com
+ * @Date: 2024-09-06 15:29:49
+ * @LastEditors: liuwenjian1523@163.com
+ * @LastEditTime: 2024-09-09 15:18:18
+ * @Description: 请填写简介
+ */
 #pragma once
 
 #include <iostream>
@@ -6,7 +13,7 @@
 namespace trt_sample {
 
 class Logger : public nvinfer1::ILogger {
- public:
+public:
   explicit Logger(Severity severity = Severity::kINFO) : mReportableSeverity(severity) {}
   nvinfer1::ILogger& getTRTLogger() { return *this; }
   Severity getReportableSeverity() const { return mReportableSeverity; }
@@ -30,4 +37,3 @@ class Logger : public nvinfer1::ILogger {
 extern Logger gLogger;
 
 }   // namespace trt_sample
-
